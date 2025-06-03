@@ -3,14 +3,30 @@
     "name": "PR Reviewer",
     "version": "1.0.0",
     "description": "Chrome extension providing AI-driven code commits. Get step-by-step help to get the commit message and summary of the PR request.",
-    "action": {
-        "default_popup": "index.html"
-    },
     "host_permissions": [
         "http://*/*",
         "https://*/*"
     ],
     "permissions": [
         "tabs"
-    ]
+    ],
+    "icons": {
+        "16": "icon16.png",
+        "24": "icon24.png",
+        "32": "icon32.png",
+        "128": "icon128.png"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "https://github.com/*"
+            ],
+            "js": [
+                "content/contentScript.js"
+            ]
+        }
+    ],
+    "action": {
+        "default_popup": "src/popup/index.html"
+    }
 }

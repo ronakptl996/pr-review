@@ -55,7 +55,7 @@ export const getBranchDiff = async (
 
   const response = await fetch(url, {
     headers: {
-      Authorization: `token GITHUB_TOKEN`,
+      Authorization: `token GIT_TOKEN`,
       Accept: "application/vnd.github.v3.diff",
     },
   });
@@ -66,5 +66,5 @@ export const getBranchDiff = async (
     );
   }
 
-  return response.text(); // This is the raw git diff string
+  return response.text();
 };

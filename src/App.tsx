@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import { generateCommitMessage, getBranchDiff } from "./utils";
 
-type CommitMessage = {
+export type CommitMessage = {
   type: string;
   summary: string;
   details: string;
@@ -66,6 +66,15 @@ function App() {
 
         console.log("commitMessage >>>", commitMessage);
         setCommitMessage(commitMessage);
+
+        chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+          if (tab.id) {
+            chrome.tabs.sendMessage(tab.id, {
+              type: "SET_COMMIT_MESSAGE",
+              payload: commitMessage,
+            });
+          }
+        });
 
         // await sendMessageToContentScript("injectCommitMessage", {
         //   commitMessage,
