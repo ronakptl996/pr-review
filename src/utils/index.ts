@@ -1,11 +1,20 @@
 import { GoogleGenAI } from "@google/genai";
+import { useChromeStorage } from "../hooks/useChromeStorage";
 
-const ai = new GoogleGenAI({
-  apiKey: "GEMINI_API_KEY",
-});
+const { getKeyValue } = useChromeStorage();
+
+let geminiTokenPR: string;
+let gitTokenPR: string;
+
+getKeyValue("geminiApi_PR_Review").then((res) => (geminiTokenPR = res));
+getKeyValue("gitToken_PR_Review").then((res) => (gitTokenPR = res));
 
 export const generateCommitMessage = async (diff: string) => {
   try {
+    const ai = new GoogleGenAI({
+      apiKey: geminiTokenPR,
+    });
+
     const prompt = `
       You're an AI developer assistant. Analyze the following git diff and generate a conventional commit message.
 
@@ -55,7 +64,7 @@ export const getBranchDiff = async (
 
   const response = await fetch(url, {
     headers: {
-      Authorization: `token GIT_TOKEN`,
+      Authorization: `token ${gitTokenPR}`,
       Accept: "application/vnd.github.v3.diff",
     },
   });
