@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import { generateCommitMessage, getBranchDiff } from "./utils";
 import { useAuthContext } from "./context/authContext";
+import { useChromeStorage } from "./hooks/useChromeStorage";
 
 export type CommitMessage = {
   type: string;
@@ -13,12 +14,12 @@ function App() {
   const [url, setUrl] = useState("");
   const [isValidCompare, setIsValidCompare] = useState(false);
   const [commitMessage, setCommitMessage] = useState<CommitMessage | null>(
-    null
+    null,
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // const storage = useChromeStorage();
+  const storage = useChromeStorage();
   const {
     isOpen,
     geminiAPI,
@@ -48,10 +49,13 @@ function App() {
     setCommitMessage(null);
     try {
       const match = url.match(
-        /^https:\/\/github\.com\/([^/]+)\/([^/]+)\/compare\/([^.]+)\.{3}(?:([^:]+):([^/]+)|([^/]+))$/
+        /^https:\/\/github\.com\/([^/]+)\/([^/]+)\/compare\/([^.]+)\.{3}(?:([^:]+):([^/]+)|([^/]+))$/,
       );
 
       if (match) {
+        const gitTokenPR = await storage.getKeyValue("gitToken_PR_Review");
+        const geminiTokenPR = await storage.getKeyValue("geminiApi_PR_Review");
+
         const [
           _,
           baseOwner,
@@ -70,11 +74,13 @@ function App() {
           baseRepo,
           baseBranch,
           finalHeadOwner,
-          finalHeadBranch
+          finalHeadBranch,
+          gitTokenPR,
         );
 
         const commitMessage = (await generateCommitMessage(
-          diff
+          diff,
+          geminiTokenPR,
         )) as CommitMessage;
 
         console.log("commitMessage >>>", commitMessage);
